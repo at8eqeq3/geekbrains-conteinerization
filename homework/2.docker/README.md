@@ -10,3 +10,44 @@
 на localhost:port должно быть доступно приложение в контейнере (оно отвечает Hello, World!).
 
 Сохраните получившийся Dockerfile в любом публичном Git репозитории, например GitHub, и пришлите ссылку на репозиторий.
+
+# Выполнение
+
+### Python
+
+Из нехитрого [Dockerfile](python/Dockerfile) при помощи `docker build -t gb:l2-python .`. Теперь так:
+
+```
+$ docker images gb
+REPOSITORY   TAG         IMAGE ID       CREATED         SIZE
+gb           l2-python   aaa922c27856   6 minutes ago   59.8MB
+```
+
+Теперь запустим `docker run --rm -p 8080:8080 gb:l2-python` и в соседнем терминале сделаем
+
+```
+$ curl http://localhost:8080
+Hello, World!
+```
+
+Успех!
+
+### Golang
+
+Здесь в соответствии с рекомендациями собираем имидж в два этапа: [Dockerfile](golang/Dockerfile). Образов прибавилось:
+
+```
+$ docker images gb
+REPOSITORY   TAG         IMAGE ID       CREATED          SIZE
+gb           l2-golang   dc95582cb863   53 seconds ago   6.57MB
+gb           l2-python   aaa922c27856   18 minutes ago   59.8MB
+```
+
+Аналогично запустим `docker run --rm -p 8080:8080 gb:l2-golang` и проверим curl:
+
+```
+$ curl http://localhost:8080
+Hello, World!
+```
+
+Успех!

@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-deployment
+  namespace: pg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: pg-app
+    spec:
+      containers:
+      - image: postgres:10.13
+        name: pg
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: pg-pass
+                key: pass
+        - name: POSTGRES_USER
+          value: testuser
+        - name: POSTGRES_DB
+          value: testdatabase
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+          name: pg
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: pvc-nfs    

@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redmine-deployment
+  namespace: pg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redmine-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: redmine-app
+    spec:
+      containers:
+      - image: redmine:4.1.1
+        name: redmine
+        env:
+        - name: REDMINE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pg-pass
+              key: pass
+        - name: REDMINE_DB_USERNAME
+          value: testuser
+        - name: REDMINE_DB_DATABASE
+          value: testdatabase
+        - name: REDMINE_DB_POSTGRES
+          value: database
+        - name: REDMINE_SECRET_KEY_BASE
+          valueFrom:
+              secretKeyRef:
+                name: pg-pass
+                key: redmine-secret
+        ports:
+        - containerPort: 3000
+          protocol: TCP
